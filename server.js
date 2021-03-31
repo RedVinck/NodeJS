@@ -26,7 +26,8 @@ issuer.defaultHttpOptions = { timeout: 15000 }
 
 const client = new issuer.Client({
   client_id: process.env.APPID_CLIENTID,
-  client_secret: process.env.APPID_SECRET
+  client_secret: process.env.APPID_SECRET,
+  client_tenant: process.env.APPID_TENANTID
 });
 
 let authorizationUrl = client.authorizationUrl({
@@ -37,26 +38,26 @@ console.log(authorizationUrl)
 
 app.get('/callback', (req, res) => {
   client.authorizationCallback(process.env.REDIRECT_URL_CALLBACK,
-      req.query, { 'response_type': 'code' })
-      .then(function (tokenSet) {
-        client.userinfo(tokenSet.access_token)
-            .then(function (userinfo) {
-              res.redirect(process.env.REDIRECT_URL_WEB_APP +
-                  '?name=' + userinfo.name +
-                  '&email=' + userinfo.email +
-                  '&id_token=' + tokenSet.id_token +
-                  '&access_token=' + tokenSet.access_token
-              );
-            })
-            .catch(function (error) {
-              console.log(error);
-              res.redirect(process.env.REDIRECT_URL_WEB_APP);
-            })
-      })
-      .catch(function (error) {
-        console.log(error);
-        res.redirect(process.env.REDIRECT_URL_WEB_APP);
-      })
+    req.query, { 'response_type': 'code' })
+    .then(function (tokenSet) {
+      client.userinfo(tokenSet.access_token)
+        .then(function (userinfo) {
+          res.redirect(process.env.REDIRECT_URL_WEB_APP +
+            '?name=' + userinfo.name +
+            '&email=' + userinfo.email +
+            '&id_token=' + tokenSet.id_token +
+            '&access_token=' + tokenSet.access_token
+          );
+        })
+        .catch(function (error) {
+          console.log(error);
+          res.redirect(process.env.REDIRECT_URL_WEB_APP);
+        })
+    })
+    .catch(function (error) {
+      console.log(error);
+      res.redirect(process.env.REDIRECT_URL_WEB_APP);
+    })
 })
 
 app.get('/loginurl', (req, res) => {
